@@ -115,6 +115,7 @@ export function App() {
     baseUrl,
     isSending,
     onSend: (text) => void handleSend(text, "stt"),
+    onTranscription: (text) => setDraft((c) => [c.trim(), text.trim()].filter(Boolean).join(" ").trim()),
     onSetupNeeded: (need) => setSetupNeed(need),
     addToast,
   });

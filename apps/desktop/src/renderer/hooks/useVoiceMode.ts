@@ -12,6 +12,7 @@ export interface UseVoiceModeOptions {
   baseUrl: string;
   isSending: boolean;
   onSend: (text: string, origin: "stt") => void;
+  onTranscription: (text: string) => void;
   onSetupNeeded: (need: SetupNeed) => void;
   addToast: (type: "error" | "success" | "info", title: string, message: string) => void;
 }
@@ -51,7 +52,7 @@ export interface UseVoiceModeReturn {
 /* ------------------------------------------------------------------ */
 
 export function useVoiceMode(options: UseVoiceModeOptions): UseVoiceModeReturn {
-  const { baseUrl, isSending, onSend, onSetupNeeded, addToast } = options;
+  const { baseUrl, isSending, onSend, onTranscription, onSetupNeeded, addToast } = options;
 
   // Voice conversation mode state
   const [voiceMode, setVoiceMode] = useState(false);
@@ -493,10 +494,7 @@ export function useVoiceMode(options: UseVoiceModeOptions): UseVoiceModeReturn {
         setIsTranscribing(true);
         try {
           const text = await uploadAudio(baseUrl, blob);
-          // For push-to-record mode, we just return the transcription
-          // The parent component handles draft state
-          // This hook doesn't directly manipulate draft
-          console.log("Transcribed text:", text);
+          onTranscription(text);
         } catch (error) {
           addToast("error", "Transcription error", error instanceof Error ? error.message : String(error));
         } finally {
