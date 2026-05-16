@@ -2,7 +2,7 @@ import { useState, type Dispatch, type SetStateAction } from "react";
 import { useEffect } from "react";
 import type { ConfigForm, LLMProvider, PublicConfig, SpeechStatus } from "../types";
 import type { SpeechSetupEvent } from "../api";
-import { getSpeechStatus, setupSpeechStreaming } from "../api";
+import { fetchOpenAIModels, getSpeechStatus, setupSpeechStreaming } from "../api";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Select } from "./ui/select";
@@ -303,6 +303,21 @@ function SettingsPanel({ configForm, setConfigForm, savedConfig, saving, onClose
   baseUrl: string;
 }) {
   const [activeTab, setActiveTab] = useState<SettingsTab>("models");
+  const [remoteModels, setRemoteModels] = useState<{ id: string; name?: string }[]>([]);
+  const [loadingModels, setLoadingModels] = useState(false);
+
+  const openaiBaseUrl = configForm.anthropic.base_url.trim();
+  useEffect(() => {
+    if (configForm.anthropic.provider === "openai" && openaiBaseUrl) {
+      setLoadingModels(true);
+      fetchOpenAIModels(openaiBaseUrl)
+        .then(setRemoteModels)
+        .finally(() => setLoadingModels(false));
+    } else {
+      setRemoteModels([]);
+    }
+  }, [configForm.anthropic.provider, openaiBaseUrl]);
+
   const llmProvider = configForm.anthropic.provider;
   const llmProviderLabel = getLlmProviderLabel(llmProvider);
   const savedLlmProvider = savedConfig?.anthropic.provider ?? null;
@@ -405,14 +420,34 @@ function SettingsPanel({ configForm, setConfigForm, savedConfig, saving, onClose
                   />
                 </Field>
               )}
-              <Field label="Model">
-                <Select value={configForm.anthropic.model} onChange={(e) => setConfigForm((c) => ({ ...c, anthropic: { ...c.anthropic, model: e.target.value } }))}>
-                  {(MODEL_PRESETS[configForm.anthropic.provider] || []).map((p) => (
-                    <option key={p.value} value={p.value}>{p.label}</option>
-                  ))}
-                </Select>
-                {configForm.anthropic.provider === "ollama" && (
-                  <Input className="mt-2" placeholder="Or type a custom model name..." value={configForm.anthropic.model} onChange={(e) => setConfigForm((c) => ({ ...c, anthropic: { ...c.anthropic, model: e.target.value } }))} />
+              <Field label="Model" hint={loadingModels ? "Loading models from endpoint…" : remoteModels.length > 0 ? `${remoteModels.length} models available from ${openaiBaseUrl}` : undefined}>
+                {remoteModels.length > 0 ? (
+                  <>
+                    <Select value={remoteModels.some((m) => m.id === configForm.anthropic.model) ? configForm.anthropic.model : "__custom__"} onChange={(e) => {
+                      if (e.target.value !== "__custom__") {
+                        setConfigForm((c) => ({ ...c, anthropic: { ...c.anthropic, model: e.target.value } }));
+                      }
+                    }}>
+                      {remoteModels.map((m) => (
+                        <option key={m.id} value={m.id}>{m.name || m.id}</option>
+                      ))}
+                      <option value="__custom__">Custom model ID…</option>
+                    </Select>
+                    {!remoteModels.some((m) => m.id === configForm.anthropic.model) && (
+                      <Input className="mt-2" placeholder="Type a model ID…" value={configForm.anthropic.model} onChange={(e) => setConfigForm((c) => ({ ...c, anthropic: { ...c.anthropic, model: e.target.value } }))} />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <Select value={configForm.anthropic.model} onChange={(e) => setConfigForm((c) => ({ ...c, anthropic: { ...c.anthropic, model: e.target.value } }))}>
+                      {(MODEL_PRESETS[configForm.anthropic.provider] || []).map((p) => (
+                        <option key={p.value} value={p.value}>{p.label}</option>
+                      ))}
+                    </Select>
+                    {configForm.anthropic.provider === "ollama" && (
+                      <Input className="mt-2" placeholder="Or type a custom model name..." value={configForm.anthropic.model} onChange={(e) => setConfigForm((c) => ({ ...c, anthropic: { ...c.anthropic, model: e.target.value } }))} />
+                    )}
+                  </>
                 )}
               </Field>
               {(configForm.anthropic.provider === "openai" || configForm.anthropic.provider === "ollama") && (

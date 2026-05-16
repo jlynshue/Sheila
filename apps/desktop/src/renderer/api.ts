@@ -289,6 +289,18 @@ export type OllamaPullEvent = {
   detail: string;
 };
 
+export async function fetchOpenAIModels(apiBaseUrl: string): Promise<{ id: string; name?: string }[]> {
+  try {
+    const url = apiBaseUrl.replace(/\/$/, "") + "/models";
+    const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    if (!response.ok) return [];
+    const data = await response.json() as { data?: Array<{ id: string; name?: string }> };
+    return (data.data || []).map((m) => ({ id: m.id, name: m.name }));
+  } catch {
+    return [];
+  }
+}
+
 export async function getOllamaStatus(baseUrl: string): Promise<OllamaStatus> {
   const response = await fetch(`${baseUrl}/api/ollama/status`);
   return parseJson<OllamaStatus>(response);
