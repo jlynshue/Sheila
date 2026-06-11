@@ -1,56 +1,125 @@
-![Roxanne banner](docs/assets/roxanne-banner.png)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Electron](https://img.shields.io/badge/Electron-47848F?logo=electron&logoColor=white)](https://www.electronjs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-# Roxanne
+# Sheila
 
-Roxanne is a local-first research copilot for text and spoken voice conversations with your Zotero library and Obsidian knowledge base using Anthropic, OpenAI, or local Ollama models. It works by indexing and embedding your entire Zotero library database and Obsidian vaults, it then uses agentic MCP to search, read and even update Zotero and Obsidian.
+**Local-first research copilot with voice — fork of Roxanne**
+
+Talk to your Zotero library and Obsidian vaults via voice or text using Anthropic Claude, OpenAI GPT, or local Ollama models. Sheila indexes and embeds your entire research database, then uses agentic MCP to search, read, and update your knowledge base—all offline and private.
+
+## Fork Improvements
+
+This fork adds substantial enhancements to the upstream Roxanne research copilot:
+
+### Phase 1: Component Architecture Refactor
+- Refactored `App.tsx` into focused, reusable component modules
+- Improved code organization and maintainability
+- Enhanced separation of concerns across the React UI layer
+
+### Phase 2: Voice Integration
+- Extracted voice and text-to-speech logic into a `useVoiceMode` custom hook
+- Integrated Unmute library for robust audio input
+- Added AWS Bedrock TTS for high-quality voice output
+- Simplified voice feature management and testing
+
+### Phase 3: Multi-Model Support
+- Implemented dynamic model dropdown from OpenAI-compatible endpoints
+- Added support for Claude Bedrock, GPT-4, and local Ollama models
+- Model selection persisted across sessions
+- Runtime model switching without app restart
+
+### Phase 4: Backend Architecture Cleanup
+- Split monolithic `main.py` into focused router modules
+- Separated concerns: orchestration, embedding, search, Zotero MCP, Obsidian MCP
+- Improved testability and maintainability of backend services
+- Cleaner error handling and logging across routes
+
+### Phase 5: Agentic Features
+- Enhanced MCP orchestration for multi-step research workflows
+- Improved Zotero and Obsidian integration with agentic capabilities
+- Better handling of complex document retrieval and processing
+
+### Phase 6: Debug & Stability
+- Fixed debug logging across frontend and backend
+- Corrected transcription callback behavior
+- Improved error messages and stack traces for troubleshooting
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Electron Shell                          │
+│                    (Main Process)                           │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────────┐
+│                    React UI Layer                           │
+│  ┌──────────────────┬──────────────────┬─────────────────┐  │
+│  │  Voice Input     │  Text Interface  │  Model Selector │  │
+│  │  (useVoiceMode)  │  (Chat UI)       │  (Dropdown)     │  │
+│  └──────────────────┴──────────────────┴─────────────────┘  │
+└────────────────────────┬────────────────────────────────────┘
+                         │ HTTP
+┌────────────────────────▼────────────────────────────────────┐
+│              FastAPI Backend (Python)                       │
+│  ┌────────────┬──────────────┬─────────────┬──────────────┐ │
+│  │ Orchestr.  │ Embeddings   │ Zotero MCP  │ Obsidian MCP │ │
+│  │ Router     │ Router       │ Router      │ Router       │ │
+│  └────────────┴──────────────┴─────────────┴──────────────┘ │
+│                         │                                    │
+│  ┌──────────────────────▼──────────────────────────────────┐ │
+│  │  FastEmbed (Vector Database)                           │ │
+│  │  Local Index of Zotero + Obsidian Content              │ │
+│  └──────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────┘
+                         │
+        ┌────────────────┼────────────────┐
+        │                │                │
+   ┌────▼────┐    ┌─────▼──────┐  ┌──────▼──────┐
+   │ Anthropic│    │  OpenAI    │  │ Ollama      │
+   │ Bedrock  │    │  (GPT-4)   │  │ (Local)     │
+   └──────────┘    └────────────┘  └─────────────┘
+```
 
 ## Install
 
-The install scripts pull the latest published Roxanne release for your platform and install it for you.
+The install scripts pull the latest published Sheila release for your platform and install it for you.
 
 ### macOS or Linux
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/TylerIllman/Roxanne/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jlynshue/Sheila/main/scripts/install.sh | bash
 ```
 
 ### Windows PowerShell
 
 ```powershell
-irm https://raw.githubusercontent.com/TylerIllman/Roxanne/main/scripts/install-windows.ps1 | iex
+irm https://raw.githubusercontent.com/jlynshue/Sheila/main/scripts/install-windows.ps1 | iex
 ```
 
-### Optional install flags
+### Optional Install Flags
 
 Install a specific version:
 
 ```bash
-ROXANNE_VERSION=v0.1.2 curl -fsSL https://raw.githubusercontent.com/TylerIllman/Roxanne/main/scripts/install.sh | bash
-```
-
-```powershell
-$env:ROXANNE_VERSION="v0.1.2"; irm https://raw.githubusercontent.com/TylerIllman/Roxanne/main/scripts/install-windows.ps1 | iex
+SHEILA_VERSION=v0.2.0 curl -fsSL https://raw.githubusercontent.com/jlynshue/Sheila/main/scripts/install.sh | bash
 ```
 
 Install without auto-opening the app:
 
 ```bash
-ROXANNE_NO_OPEN=1 curl -fsSL https://raw.githubusercontent.com/TylerIllman/Roxanne/main/scripts/install.sh | bash
+SHEILA_NO_OPEN=1 curl -fsSL https://raw.githubusercontent.com/jlynshue/Sheila/main/scripts/install.sh | bash
 ```
 
-```powershell
-$env:ROXANNE_NO_OPEN="1"; irm https://raw.githubusercontent.com/TylerIllman/Roxanne/main/scripts/install-windows.ps1 | iex
-```
-
-On macOS, the CLI installer removes the quarantine attribute after installation so the app can open more cleanly than a normal browser download.
-
-After install, you can launch Roxanne from a terminal with:
+After install, launch from your terminal:
 
 ```bash
-roxanne
+sheila
 ```
 
-On macOS and Linux this launcher is installed into `~/.local/bin`. If `roxanne` is not found, add `~/.local/bin` to your `PATH`.
+On macOS and Linux, the launcher is installed into `~/.local/bin`. Add it to your `PATH` if needed.
 
 ## Develop Locally
 
@@ -58,28 +127,26 @@ On macOS and Linux this launcher is installed into `~/.local/bin`. If `roxanne` 
 
 - Python 3.10+
 - Node.js 20+
-- optional: [Ollama](https://ollama.com) for local models
+- Optional: [Ollama](https://ollama.com) for local models
 
-### Clone the repo
+### Clone the Repo
 
 ```bash
-git clone https://github.com/TylerIllman/Roxanne.git
-cd Roxanne
+git clone https://github.com/jlynshue/Sheila.git
+cd Sheila
 ```
 
-### One-command setup
-
-The quickest source install is:
+### Quick Setup
 
 ```bash
 npm run setup
 ```
 
-That creates `apps/backend/.venv`, installs the editable backend with test dependencies, and installs the desktop dependencies.
+This creates `apps/backend/.venv`, installs the editable backend with test dependencies, and installs desktop dependencies.
 
-If you prefer the manual steps instead:
+### Manual Setup
 
-### Set up the backend
+**Backend:**
 
 ```bash
 python3 -m venv apps/backend/.venv
@@ -95,88 +162,107 @@ py -3 -m venv apps/backend/.venv
 pip install -e ".\apps\backend[test]"
 ```
 
-### Install frontend dependencies
+**Frontend:**
 
 ```bash
 npm install
 ```
 
-### Run Roxanne in development
+### Run in Development
 
-Open the full app from the repo:
+Full app:
 
 ```bash
 npm run open:desktop
 ```
 
-For easier debugging, these commands keep the backend and desktop shell separate:
+Separate processes (easier debugging):
 
 ```bash
-npm run debug:backend
-npm run debug:frontend
-npm run debug:desktop
-npm run debug:full
+npm run debug:backend       # FastAPI backend with reload
+npm run debug:frontend      # React dev server
+npm run debug:desktop       # Electron shell (needs backend running)
+npm run debug:full          # Backend + Electron together
 ```
 
-What they do:
+### Build the App
 
-- `npm run debug:backend` starts only the FastAPI backend with reload and debug logging.
-- `npm run debug:frontend` starts only the renderer dev server.
-- `npm run debug:desktop` starts the Electron shell and points it at an already-running backend on `http://127.0.0.1:8000`.
-- `npm run debug:full` runs the backend plus the Electron shell workflow together.
-
-Roxanne is not currently published as an `npm` or `pip` package, so the release installer remains the simplest no-build install path for end users. If you want a package-manager install later, that should be done as a separate publish/distribution change rather than just a repo script.
-
-## Build The App Locally
-
-Make sure the backend virtual environment exists and has the build dependencies installed:
+Ensure backend dependencies include build tools:
 
 ```bash
 source apps/backend/.venv/bin/activate
 pip install -e "./apps/backend[build]"
 ```
 
-Then build the desktop app from the repo root:
+Build unpacked release:
 
 ```bash
-ROXANNE_PYTHON_BIN="$PWD/apps/backend/.venv/bin/python3" npm run pack:desktop
+SHEILA_PYTHON_BIN="$PWD/apps/backend/.venv/bin/python3" npm run pack:desktop
 ```
 
-That creates an unpacked packaged build for your current platform.
-
-To build the actual installer for your current platform:
+Build installer for your platform:
 
 ```bash
-ROXANNE_PYTHON_BIN="$PWD/apps/backend/.venv/bin/python3" npm run dist:desktop
+SHEILA_PYTHON_BIN="$PWD/apps/backend/.venv/bin/python3" npm run dist:desktop
 ```
 
-Build outputs go to `apps/desktop/release`.
+Outputs go to `apps/desktop/release`.
 
-## Run Tests
+### Run Tests
 
-Backend tests:
+**Backend tests:**
 
 ```bash
 source apps/backend/.venv/bin/activate
 python -m pytest apps/backend/tests -m "not slow and not integration"
 ```
 
-Desktop type-check:
+**Desktop type-check:**
 
 ```bash
 npm --workspace apps/desktop run lint
 ```
 
+## Tech Stack
+
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| **Desktop** | Electron | Cross-platform app shell |
+| **UI** | React + TypeScript | Component-based interface with type safety |
+| **Backend** | FastAPI (Python) | REST API and orchestration |
+| **Embeddings** | FastEmbed | Fast, local vector embeddings |
+| **Vector DB** | Built-in | Indexed embeddings of research library |
+| **LLM** | Claude (Bedrock) / GPT-4 / Ollama | Multi-model inference |
+| **Voice** | Unmute + AWS Bedrock TTS | Audio input and speech synthesis |
+| **Research Integration** | MCP (Model Context Protocol) | Agentic Zotero and Obsidian access |
+| **Package Manager** | npm (frontend) + pip (backend) | Dependency management |
+
 ## Project Layout
 
 ```text
 apps/
-  backend/            FastAPI backend, indexing, orchestration, storage
+  backend/            FastAPI backend, indexing, orchestration, routers
   desktop/            Electron shell and React renderer
 scripts/
   build-backend-binary.mjs
   install.sh
   install-windows.ps1
 docs/assets/
-  roxanne-banner.png
+  banner.png
 ```
+
+## Credits
+
+**Forked from [Roxanne](https://github.com/TylerIllman/Roxanne)** by [Tyler Illman](https://github.com/TylerIllman)
+
+This fork extends Roxanne with voice integration, multi-model support, and architectural improvements for production use.
+
+## Author
+
+[**Jonathan Lyn-Shue**](https://jonathanlynshue.com) — Fractional CIO/CTO | Data & AI Executive
+
+---
+
+## License
+
+MIT — See LICENSE file for details.
