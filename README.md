@@ -10,6 +10,38 @@
 
 Talk to your Zotero library and Obsidian vaults via voice or text using Anthropic Claude, OpenAI GPT, or local Ollama models. Sheila indexes and embeds your entire research database, then uses agentic MCP to search, read, and update your knowledge base—all offline and private.
 
+## Features at a Glance
+
+- **Multi-model inference** — Claude (Bedrock), GPT-4, Ollama (local) via unified interface
+- **Voice input/output** — STT (Unmute) + TTS (AWS Bedrock) for hands-free research
+- **Zotero integration** — Search your library, pull annotations, cite papers inline via MCP
+- **Obsidian integration** — Query your vault, link notes, surface connections via MCP
+- **Offline-first** — Vector embeddings indexed locally (FastEmbed), no cloud dependency for search
+- **Streaming responses** — Server-Sent Events for real-time generation
+- **Conversation persistence** — Full chat history with search and export
+- **Cross-platform** — macOS, Windows, Linux (Electron + Python backend)
+
+## Screenshots
+
+> Screenshots coming soon. The app includes:
+> - **Chat interface** with model selector, streaming markdown rendering, and citation links
+> - **Voice mode** with real-time STT indicator and TTS playback controls
+> - **Research panel** showing Zotero results, Obsidian note connections, and web search
+> - **Settings** for model configuration, voice engine selection, and index management
+
+## How It Differs from Roxanne
+
+Sheila is forked from [Roxanne](https://github.com/TylerIllman/Roxanne) with significant additions:
+
+| Area | Roxanne | Sheila |
+|------|---------|--------|
+| **LLM support** | OpenAI only | Claude (Bedrock) + GPT-4 + Ollama with runtime switching |
+| **Voice** | None | Full STT/TTS pipeline (Unmute + AWS Bedrock TTS) |
+| **Tool system** | Hardcoded integrations | MCP-based agentic orchestration (Zotero, Obsidian) |
+| **Search** | Cloud-dependent | FastEmbed local vector indexing, offline-first |
+| **Architecture** | Monolithic backend | Modular router-based FastAPI with separated concerns |
+| **Streaming** | Polling | SSE-based real-time responses |
+
 ## Fork Improvements
 
 This fork adds substantial enhancements to the upstream Roxanne research copilot:
