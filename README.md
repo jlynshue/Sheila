@@ -6,9 +6,17 @@
 
 # Sheila
 
+![Sheila banner](docs/assets/roxanne-banner.png)
+
 **Local-first research copilot with voice — fork of Roxanne**
 
 Talk to your Zotero library and Obsidian vaults via voice or text using Anthropic Claude, OpenAI GPT, or local Ollama models. Sheila indexes and embeds your entire research database, then uses agentic MCP to search, read, and update your knowledge base—all offline and private.
+
+> **Quick start (macOS / Linux):**
+> ```bash
+> curl -fsSL https://raw.githubusercontent.com/jlynshue/Sheila/main/scripts/install.sh | bash
+> ```
+> See [Install](#install) for Windows and options.
 
 ## Features at a Glance
 
@@ -21,13 +29,14 @@ Talk to your Zotero library and Obsidian vaults via voice or text using Anthropi
 - **Conversation persistence** — Full chat history with search and export
 - **Cross-platform** — macOS, Windows, Linux (Electron + Python backend)
 
-## Screenshots
+## Interface
 
-> Screenshots coming soon. The app includes:
-> - **Chat interface** with model selector, streaming markdown rendering, and citation links
-> - **Voice mode** with real-time STT indicator and TTS playback controls
-> - **Research panel** showing Zotero results, Obsidian note connections, and web search
-> - **Settings** for model configuration, voice engine selection, and index management
+The desktop app is organized into four working surfaces:
+
+- **Chat interface** — model selector, streaming markdown rendering, and citation links
+- **Voice mode** — real-time STT indicator and TTS playback controls
+- **Research panel** — Zotero results, Obsidian note connections, and web search
+- **Settings** — model configuration, voice engine selection, and index management
 
 ## How It Differs from Roxanne
 
@@ -42,42 +51,15 @@ Sheila is forked from [Roxanne](https://github.com/TylerIllman/Roxanne) with sig
 | **Architecture** | Monolithic backend | Modular router-based FastAPI with separated concerns |
 | **Streaming** | Polling | SSE-based real-time responses |
 
-## Fork Improvements
+## What This Fork Adds
 
-This fork adds substantial enhancements to the upstream Roxanne research copilot:
+This fork extends the upstream Roxanne research copilot with:
 
-### Phase 1: Component Architecture Refactor
-- Refactored `App.tsx` into focused, reusable component modules
-- Improved code organization and maintainability
-- Enhanced separation of concerns across the React UI layer
-
-### Phase 2: Voice Integration
-- Extracted voice and text-to-speech logic into a `useVoiceMode` custom hook
-- Integrated Unmute library for robust audio input
-- Added AWS Bedrock TTS for high-quality voice output
-- Simplified voice feature management and testing
-
-### Phase 3: Multi-Model Support
-- Implemented dynamic model dropdown from OpenAI-compatible endpoints
-- Added support for Claude Bedrock, GPT-4, and local Ollama models
-- Model selection persisted across sessions
-- Runtime model switching without app restart
-
-### Phase 4: Backend Architecture Cleanup
-- Split monolithic `main.py` into focused router modules
-- Separated concerns: orchestration, embedding, search, Zotero MCP, Obsidian MCP
-- Improved testability and maintainability of backend services
-- Cleaner error handling and logging across routes
-
-### Phase 5: Agentic Features
-- Enhanced MCP orchestration for multi-step research workflows
-- Improved Zotero and Obsidian integration with agentic capabilities
-- Better handling of complex document retrieval and processing
-
-### Phase 6: Debug & Stability
-- Fixed debug logging across frontend and backend
-- Corrected transcription callback behavior
-- Improved error messages and stack traces for troubleshooting
+- **Multi-model support** — Claude Bedrock, GPT-4, and local Ollama via a dynamic model dropdown, with runtime switching (no restart) and selection persisted across sessions
+- **Full voice pipeline** — a `useVoiceMode` hook wiring Unmute audio input and AWS Bedrock TTS output
+- **Agentic MCP tooling** — MCP orchestration for multi-step research workflows across Zotero and Obsidian
+- **Modular backend** — monolithic `main.py` split into focused router modules (orchestration, embedding, search, Zotero MCP, Obsidian MCP) with cleaner error handling
+- **Refactored React UI** — `App.tsx` broken into focused, reusable component modules, plus debug-logging and transcription-callback fixes for stability
 
 ## Architecture
 
@@ -281,7 +263,7 @@ scripts/
   install.sh
   install-windows.ps1
 docs/assets/
-  banner.png
+  roxanne-banner.png
 ```
 
 ## Credits
